@@ -35,7 +35,7 @@ public class Http {
      * @date: 2023/7/27 16:36
      * @return: void
      **/
-    public void getFileStream() {
+    public void getFileStream() throws IOException {
         Map<String, Object> params = new HashMap<>();
         params.put("key", "value");
         HttpHeaders header = new HttpHeaders();
@@ -50,12 +50,9 @@ public class Http {
         httpEntity = new HttpEntity(params, header);
         ResponseEntity<byte[]> textToVoice = restTemplate.postForEntity("url", httpEntity, byte[].class);
         FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(new File(""));
-            outputStream.write(textToVoice.getBody());
-        }catch(IOException e) {
-            throw new RuntimeException(e);
-        }
+        outputStream = new FileOutputStream(new File(""));
+        outputStream.write(textToVoice.getBody());
+
 
         // --------------------- hutool方式
         //获取返回值
@@ -64,5 +61,7 @@ public class Http {
         HttpResponse response = HttpUtil.createPost("/api/aigov/gw/downloadFile?storageId=").execute();
         InputStream inputStream = response.bodyStream();
         IoUtil.copy(inputStream, outputStream);
+        inputStream.close();
+        outputStream.close();
     }
 }
